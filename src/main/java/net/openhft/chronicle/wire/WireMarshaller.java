@@ -135,7 +135,14 @@ public class WireMarshaller<T> {
     public static void getAllField(@NotNull Class clazz, @NotNull Map<String, Field> map) {
         if (clazz != Object.class && clazz != AbstractCommonMarshallable.class)
             getAllField(clazz.getSuperclass(), map);
-        for (@NotNull Field field : clazz.getDeclaredFields()) {
+        Field[] fields = clazz.getDeclaredFields();
+        Arrays.sort(fields, new Comparator<Field>() {
+            @Override
+            public int compare(Field o1, Field o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
+        for (@NotNull Field field : fields) {
             if ((field.getModifiers() & (Modifier.STATIC | Modifier.TRANSIENT)) != 0)
                 continue;
             if ("ordinal".equals(field.getName()) && Enum.class.isAssignableFrom(clazz))
